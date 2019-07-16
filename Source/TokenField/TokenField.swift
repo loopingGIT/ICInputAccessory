@@ -44,6 +44,8 @@ import UIKit
   @objc optional func tokenField(_ tokenField: TokenField, didDeleteText text: String, atIndex index: Int)
   /// Asks the delegate for the subsequent delimiter string for a completed text in the token field.
   @objc optional func tokenField(_ tokenField: TokenField, subsequentDelimiterForCompletedText text: String) -> String
+  /// Asks the delegate if it should change characters in that range
+  @objc optional func tokenField(_ tokenField: TokenField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool
 }
 
 
@@ -314,8 +316,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 
       return false
     }
-
-    return true
+    return delegate?.tokenField?(self, shouldChangeCharactersIn: range, replacementString: string) ?? true
   }
 
   open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
