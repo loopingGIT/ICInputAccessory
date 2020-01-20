@@ -60,6 +60,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 
   /// Characters that completes a new token, defaults are whitespace and commas.
   public var delimiters = [" ", ",", "，"]
+    public var maxNumberOfTokens: Int?
 
   /// Texts of each created token.
   public var texts: [String] {
@@ -287,6 +288,9 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
   }
 
   open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+    if let numberOfTokens = self.maxNumberOfTokens, tokens.count >= numberOfTokens {
+        return false
+    }
     _ = removeHighlightedToken()  // as user starts typing when a token is focused
     inputTextField.showsCursor = true
 

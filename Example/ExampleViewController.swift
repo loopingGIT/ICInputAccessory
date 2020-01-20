@@ -114,6 +114,7 @@ class ExampleViewController: UITableViewController {
       let container = UIView(frame: cell.bounds)
       let tokenField = type.init()
       tokenField.placeholder = String(describing: type)
+      tokenField.maxNumberOfTokens = 1
       tokenField.frame = container.bounds.insetBy(dx: 5, dy: 0)
       tokenField.autoresizingMask = [.flexibleWidth, .flexibleHeight]
       container.addSubview(tokenField)
