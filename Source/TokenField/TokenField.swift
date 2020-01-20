@@ -350,6 +350,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
       // Notify the delegate of the changed input text manually.
       let index = text.index(text.endIndex, offsetBy: -1)
       delegate?.tokenField?(self, didChangeInputText: String(text[..<index]))
+        _ = delegate?.tokenField?(self, shouldChangeCharactersIn: NSRange(location: text.count - 1, length: 1), replacementString: "")
     }
 
     return true
