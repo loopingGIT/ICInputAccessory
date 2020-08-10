@@ -209,7 +209,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
   }()
 
   private lazy var leftEdgeConstraint: NSLayoutConstraint = {
-    NSLayoutConstraint(item: self.scrollView, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 10)
+    NSLayoutConstraint(item: self.scrollView, attribute: .left, relatedBy: .equal, toItem: self, attribute: .left, multiplier: 1, constant: 6.0)
   }()
 
   private lazy var tapGestureRecognizer: UITapGestureRecognizer = {
