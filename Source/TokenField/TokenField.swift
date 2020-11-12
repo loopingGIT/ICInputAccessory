@@ -374,7 +374,7 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
     // Hilight the tapped token
     for token in tokens {
       if token.frame.contains(touch) {
-        scrollView.scrollRectToVisible(token.frame, animated: true)
+//        scrollView.scrollRectToVisible(token.frame, animated: true)
         token.isHighlighted = true
         shouldFocusInputTextField = false
       } else {
@@ -453,9 +453,10 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
       height: scrollView.frame.height
     )
 
-    contentRect = contentRect.union(inputTextField.frame)
-    scrollView.contentSize = contentRect.size
-    scrollView.scrollRectToVisible(inputTextField.frame, animated: true)
+//    contentRect = contentRect.union(inputTextField.frame)
+//    scrollView.contentSize = contentRect.size
+    //comment this to prevent long names to be cut (we only show one name)
+//    scrollView.scrollRectToVisible(inputTextField.frame, animated: true)
   }
 
   // MARK: - Public Methods
