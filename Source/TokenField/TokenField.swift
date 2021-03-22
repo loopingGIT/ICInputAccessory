@@ -287,41 +287,41 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
     delegate?.tokenFieldDidEndEditing?(self)
   }
 
-  open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-    if let numberOfTokens = self.maxNumberOfTokens, tokens.count >= numberOfTokens {
-        return false
+    open func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let numberOfTokens = self.maxNumberOfTokens, tokens.count >= numberOfTokens {
+            return false
+        }
+        _ = removeHighlightedToken()  // as user starts typing when a token is focused
+        inputTextField.showsCursor = true
+        
+        guard let input = textField.text else {
+            return true
+        }
+        
+        let text = (input as NSString).replacingCharacters(in: range, with: string)
+        delegate?.tokenField?(self, didChangeInputText: text)
+        
+        for delimiter in delimiters {
+            guard text.hasSuffix(delimiter) else {
+                continue
+            }
+            
+            let index = text.index(text.endIndex, offsetBy: -delimiter.count)
+            let newText = String(text[..<index])
+            
+            if !newText.isEmpty && newText != delimiter && (delegate?.tokenField?(self, shouldCompleteText: newText) ?? true) {
+                tokens.append(customizedToken(with: newText))
+                layoutTokenTextField()
+                delegate?.tokenField?(self, didCompleteText: newText)
+            }
+            
+            textField.text = nil
+            togglePlaceholderIfNeeded()
+            
+            return false
+        }
+        return delegate?.tokenField?(self, shouldChangeCharactersIn: range, replacementString: string) ?? true
     }
-    _ = removeHighlightedToken()  // as user starts typing when a token is focused
-    inputTextField.showsCursor = true
-
-    guard let input = textField.text else {
-      return true
-    }
-
-    let text = (input as NSString).replacingCharacters(in: range, with: string)
-    delegate?.tokenField?(self, didChangeInputText: text)
-
-    for delimiter in delimiters {
-      guard text.hasSuffix(delimiter) else {
-        continue
-      }
-
-      let index = text.index(text.endIndex, offsetBy: -delimiter.count)
-      let newText = String(text[..<index])
-
-      if !newText.isEmpty && newText != delimiter && (delegate?.tokenField?(self, shouldCompleteText: newText) ?? true) {
-        tokens.append(customizedToken(with: newText))
-        layoutTokenTextField()
-        delegate?.tokenField?(self, didCompleteText: newText)
-      }
-
-      textField.text = nil
-      togglePlaceholderIfNeeded()
-
-      return false
-    }
-    return delegate?.tokenField?(self, shouldChangeCharactersIn: range, replacementString: string) ?? true
-  }
 
   open func textFieldShouldReturn(_ textField: UITextField) -> Bool {
     completeCurrentInputText()
@@ -332,29 +332,28 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
 
   // MARK: - BackspaceTextFieldDelegate
 
-  @nonobjc func textFieldShouldDelete(_ textField: BackspaceTextField) -> Bool {
-    if !textField.showsCursor {
-      _ = removeHighlightedToken()
-      return true
+    @nonobjc func textFieldShouldDelete(_ textField: BackspaceTextField) -> Bool {
+        if !textField.showsCursor {
+            _ = removeHighlightedToken()
+            return true
+        }
+        
+        guard let text = textField.text else {
+            return true
+        }
+        
+        if text.isEmpty {
+            textField.showsCursor = false
+            tokens.last?.isHighlighted = true
+        } else {
+            // textField(_:shouldChangeCharactersIn:replacementString:) is skipped when the delete key is pressed.
+            // Notify the delegate of the changed input text manually.
+            let index = text.index(text.endIndex, offsetBy: -1)
+            delegate?.tokenField?(self, didChangeInputText: String(text[..<index]))
+        }
+        
+        return false
     }
-
-    guard let text = textField.text else {
-      return true
-    }
-
-    if text.isEmpty {
-      textField.showsCursor = false
-      tokens.last?.isHighlighted = true
-    } else {
-      // textField(_:shouldChangeCharactersIn:replacementString:) is skipped when the delete key is pressed.
-      // Notify the delegate of the changed input text manually.
-      let index = text.index(text.endIndex, offsetBy: -1)
-      delegate?.tokenField?(self, didChangeInputText: String(text[..<index]))
-        _ = delegate?.tokenField?(self, shouldChangeCharactersIn: NSRange(location: text.count - 1, length: 1), replacementString: "")
-    }
-
-    return true
-  }
 
   // MARK: - UIResponder Callbacks
 
