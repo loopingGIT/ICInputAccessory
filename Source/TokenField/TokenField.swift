@@ -308,14 +308,18 @@ open class TokenField: UIView, UITextFieldDelegate, BackspaceTextFieldDelegate {
             
             let index = text.index(text.endIndex, offsetBy: -delimiter.count)
             let newText = String(text[..<index])
+            let shouldCompleteText = (delegate?.tokenField?(self, shouldCompleteText: newText) ?? true)
             
-            if !newText.isEmpty && newText != delimiter && (delegate?.tokenField?(self, shouldCompleteText: newText) ?? true) {
+            if !newText.isEmpty && newText != delimiter && shouldCompleteText {
                 tokens.append(customizedToken(with: newText))
                 layoutTokenTextField()
                 delegate?.tokenField?(self, didCompleteText: newText)
             }
             
-            textField.text = nil
+            if shouldCompleteText {
+                textField.text = nil
+            }
+            
             togglePlaceholderIfNeeded()
             
             return false
